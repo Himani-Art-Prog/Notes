@@ -1,0 +1,82 @@
+Here, I ensure that itemData contains neccessary properties (props, axisY, chartProperty, etc.) before accessing them. 
+we can do this by either checking if itemData exists before accessing its properties or providing default values to avoid such errors.
+
+import React, { useEffect, useRef, useState } from 'react';
+
+function StackedColumnChart({ itemData }) {
+    const chartContainerRef = useRef(null);
+    const [defaultWidth, setDefaultWidth] = useState(null);
+    const [defaultHeight, setDefaultHeight] = useState(null);
+    let chart = null;
+
+    useEffect(() => {
+        const parentContainer = chartContainerRef.current.parentElement;
+        const parentWidth = parentContainer.offsetWidth;
+        const parentHeight = parentContainer.offsetHeight;
+        setDefaultWidth(parentWidth);
+        setDefaultHeight(parentHeight);
+
+        const script = document.createElement('script');
+        script.src = 'https://canvasjs.com/assets/script/canvasjs.min.js';
+        script.async = true;
+        document.body.appendChild(script);
+
+        script.onload = () => {
+            chart = new window.CanvasJS.Chart(chartContainerRef.current, {
+                backgroundColor: itemData?.props?.backgroundColor || "#ffffff", // Default background color if not provided
+                theme: itemData?.chartProperty?.theme || "light1", // Default theme if not provided
+                title: {
+                    text: itemData?.chartProperty?.donutName || "", // Default title if not provided
+                    verticalAlign: itemData?.chartProperty?.position || "center",
+                    dockInsidePlotArea: true,
+                    fontFamily: "Bahnschrift Light"
+                },
+                axisY: {
+                    viewportMinimum: itemData?.axisY?.viewportMinimum || 0, // Default viewport minimum if not provided
+                    viewportMaximum: itemData?.axisY?.viewportMaximum || 100 // Default viewport maximum if not provided
+                },
+                data: [{
+                    type: "column",
+                    indexLabel: "{label}: {y}",
+                    dataPoints: itemData?.dataponits?.map(point => ({
+                        label: point.label,
+                        y: point.y,
+                        color: point.color 
+                    })) || [] // Default to an empty array if dataPoints not provided
+                }]
+            });
+           
+            chart.render();
+        };
+
+        return () => {
+            document.body.removeChild(script);
+        };
+    }, [itemData]);
+
+    useEffect(() => {
+        if (chart) {
+            chart.options.width = itemData?.props?.width || defaultWidth;
+            chart.options.height = itemData?.props?.height || defaultHeight;
+            chart.render();
+        }
+    }, [itemData, defaultWidth, defaultHeight]);
+
+    return (
+        <div
+            ref={chartContainerRef}
+            style={{
+                height: itemData?.props?.height || "100px", // Default height if not provided
+                width: itemData?.props?.width || "100px", // Default width if not provided
+                position: 'relative'
+            }}
+        />
+    );
+}
+
+export default StackedColumnChart;
+
+Points:-
+1) I've used optional chaining (?.) to safely access properties of itemData and provide default values if they're not available.
+2)Default values are provided for properties like background color, theme, title, viewport minimum and maximum, width, and height if they're not provided in itemData.
+3)I've also provided default values for dataPoints to prevent errors when mapping over them if they're not available.
