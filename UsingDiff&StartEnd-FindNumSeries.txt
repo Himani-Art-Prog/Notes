@@ -1,0 +1,72 @@
+import React, { useState, useEffect } from 'react';
+
+const FindNumberSeries = ()=>{
+
+    const [yAxisStart, setYAxisStart] = useState(0);
+    const [yAxisEnd, setYAxisEnd] = useState(100);
+    const [yAxisStep, setYAxisStep] = useState(10);
+    const [yAxisValues, setYAxisValues] = useState([]);
+
+ useEffect(() => {
+        generateYAxisValues();
+  }, [yAxisStart, yAxisEnd, yAxisStep]);
+
+    const handleYAxisStartChange = (e) => {
+        setYAxisStart(parseInt(e.target.value));
+    };
+
+    const handleYAxisEndChange = (e) => {
+        setYAxisEnd(parseInt(e.target.value));
+    };
+
+    const handleYAxisStepChange = (e) => {
+        setYAxisStep(parseInt(e.target.value));
+    };
+
+    const generateYAxisValues = () => {
+        const values = [];
+        let current = parseFloat(yAxisStart);
+        const end = parseFloat(yAxisEnd);
+        const step = parseFloat(yAxisStep);
+
+        const stepSize = (end - current) / Math.ceil((end - current) / step);
+
+        for (let i = 0; current <= end; i++) {
+            values.push(current);
+            current += stepSize;
+        }
+
+        setYAxisValues(values);
+        console.log(values); // Print values to console
+    };
+
+    return (
+                <>
+                    <div className='mt-2'>
+                        <label className='lablefeildcss'>Y-axis Range:</label>
+                        <div>
+                            <div>
+                                <label>Start Point:</label>
+                                <input type="number" value={yAxisStart} onChange={handleYAxisStartChange} />
+                            </div>
+                            <div>
+                                <label>End Point:</label>
+                                <input type="number" value={yAxisEnd} onChange={handleYAxisEndChange} />
+                            </div>
+                            <div>
+                                <label>Step:</label>
+                                <input type="number" value={yAxisStep} onChange={handleYAxisStepChange} />
+                            </div>
+                        </div>
+                    </div>
+                    <div className="x-axis-values">
+                           <h6>Y-Axis Values:</h6>
+                           <ul>
+                                {yAxisValues.map((value, index) => (
+                                      <li key={index}>{value}</li>
+                                ))}
+                           </ul>
+                    </div>
+             </>
+}
+export default FindNumberSeries;
