@@ -1,0 +1,11 @@
+1] Check here itemData is null or not
+
+const StackedColumnChart = ({ itemData }) => {
+    console.log("itemData:", itemData); // Print itemData to see its value
+    if (!itemData || !itemData.content) {
+        console.log("Item data or content is undefined."); // Print a message if itemData or itemData.content is undefined
+        return null; // Return null if itemData or itemData.content is undefined
+    }
+}
+
+By adding these null checks, the component will return null if itemData or itemData.content is undefined, preventing the "Cannot read properties of undefined" error.
