@@ -1,0 +1,21 @@
+We can understand the actual meaning of code & logic behind it.
+1) dynamically set the class name and style of an icon based on the item.type value.
+<i className={`fa fa-${item.type === 'column' ? 'bar' : item.type === 'spline' || item.type === 'stepLine' ? 'line' : item.type}-chart`} style={{ color: item.color }} />
+
+-->Font Awesome Icons -
+ Line Chart - fa fa-line-chart
+Bar Chart - fa fa-bar-chart
+Area Chart -  fa fa-area-chart
+ 
+we have only this three icons but type have more option so Line chart can be used for spline & stepline chart as well as bar chart is used for column chart also,
+
+* <i>: This is an HTML <i> tag, often used to display icons using libraries like FontAwesome.
+className={fa fa-${item.type === 'column' ? 'bar' : item.type === 'spline' || item.type === 'stepLine' ? 'line' : item.type}-chart}:
+i) This dynamically sets the class name of the <i> tag.
+ii) If item.type is 'column', it sets the class to 'fa fa-bar-chart'.
+If item.type is 'spline' or 'stepLine', it sets the class to 'fa fa-line-chart'.
+Otherwise, it sets the class to 'fa fa-${item.type}-chart', where ${item.type} is the value of item.type.
+iii) style={{ color: item.color }}:
+This dynamically sets the color of the icon using the item.color value.
+In summary, this line renders an icon with a class name and color based on the item.type and item.color values passed to the component.
+
