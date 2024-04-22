@@ -7,7 +7,7 @@ We can understand the actual meaning of code & logic behind it.
 Bar Chart - fa fa-bar-chart
 Area Chart -  fa fa-area-chart
  
-we have only this three icons but type have more option so Line chart can be used for spline & stepline chart as well as bar chart is used for column chart also,
+we have only this three icons but type have more option so Line chart can be used for spline & stepline chart as well as bar chart is used for column chart
 
 * <i>: This is an HTML <i> tag, often used to display icons using libraries like FontAwesome.
 className={fa fa-${item.type === 'column' ? 'bar' : item.type === 'spline' || item.type === 'stepLine' ? 'line' : item.type}-chart}:
