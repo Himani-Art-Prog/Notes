@@ -10,3 +10,13 @@ const StackedColumnChart = ({ itemData }) => {
 
 By adding these null checks, the component will return null if itemData or itemData.content is undefined, preventing the "Cannot read properties of undefined" error.
 [here itemData can be print]
+
+
+2) This code Snippet have an error so we check it,
+
+<div className='d-flex align-items-center gap-2'>
+    <label className='lablefeildcss'>Title:</label>
+    <input type="text" className='inputfeildofcss' value={axisX && axisX.title} onChange={(e) => handleAxisYChange(axisX, "axisX",      e.target.value, "title")} />
+</div>
+
+By adding the conditional check axisX && axisX.title, you ensure that the title property is accessed only if axisX is not undefined. This prevents the error from occurring when axisX is not properly initialized.
