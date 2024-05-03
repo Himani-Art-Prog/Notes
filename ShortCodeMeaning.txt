@@ -55,3 +55,9 @@ In summary, the toggleVisibility function toggles the visibility of a block. If 
       const columns = Math.ceil(totalKPIs / rows);
     return { rows, columns };
   };
+  const { rows, columns } = calculateTableLayout();
+
+  const chunkedKpis = [];
+  for (let i = 0; i < kpis.length; i += columns) {
+    chunkedKpis.push(kpis.slice(i, i + columns));
+  }
