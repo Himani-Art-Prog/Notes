@@ -1,5 +1,6 @@
 We can understand the actual meaning of code & logic behind it.
-1) dynamically set the class name and style of an icon based on the item.type value.
+1) Code Snippet 1:
+dynamically set the class name and style of an icon based on the item.type value.
 
 <i className={`fa fa-${item.type === 'column' ? 'bar' : item.type === 'spline' || item.type === 'stepLine' ? 'line' : item.type}-chart`} style={{ color: item.color }} />
 
@@ -19,7 +20,8 @@ We can understand the actual meaning of code & logic behind it.
 In summary, this line renders an icon with a class name and color based on the item.type and item.color values passed to the component.
 
 
-2) If we want to toggle on div and another div close in nutshell if one time we want to toggle only one div then we used below code,
+2) Code Snippet 2:
+If we want to toggle on div and another div close in nutshell if one time we want to toggle only one div then we used below code,
   const [visibleBlock, setVisibleBlock] = useState(null);
   const toggleVisibility = (blockNumber) => {
         setVisibleBlock(prevVisibleBlock => prevVisibleBlock === blockNumber ? null : blockNumber);
@@ -32,3 +34,14 @@ In summary, this line renders an icon with a class name and color based on the i
        If they are the same (prevVisibleBlock === blockNumber), it sets prevVisibleBlock to null, effectively hiding the block.
        If they are different, it sets prevVisibleBlock to the blockNumber, making that block visible.
 In summary, the toggleVisibility function toggles the visibility of a block. If the block with the given blockNumber is currently visible, it hides it by setting the visible block to null. If it's hidden or another block is visible, it shows the block with the given blockNumber.
+
+3)Code Snippet 3:
+  {tableFormat.map((item, index) => (
+            <tr key={index}>
+              {/* If it's the first cell, apply the props */}
+              {index === 0 ? (
+                <td style={item.props}>{item.label}</td>
+              ) : (
+                // For other cells, render empty cells
+                <td></td>
+              )}
