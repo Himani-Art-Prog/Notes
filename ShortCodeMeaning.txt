@@ -45,3 +45,13 @@ In summary, the toggleVisibility function toggles the visibility of a block. If 
                 // For other cells, render empty cells
                 <td></td>
               )}
+
+
+4) code snippet 4:
+    const calculateTableLayout = () => {
+      const totalKPIs = kpis.length;
+      const sqrt = Math.sqrt(totalKPIs);
+      const rows = Math.ceil(sqrt);
+      const columns = Math.ceil(totalKPIs / rows);
+    return { rows, columns };
+  };
