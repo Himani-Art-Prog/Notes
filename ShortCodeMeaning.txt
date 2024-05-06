@@ -61,3 +61,37 @@ In summary, the toggleVisibility function toggles the visibility of a block. If 
   for (let i = 0; i < kpis.length; i += columns) {
     chunkedKpis.push(kpis.slice(i, i + columns));
   }
+
+5) code snippet 5:
+    const handleResizeStop = (layout) => {
+        const updatedItems = items.map(item => {
+            const layoutItem = layout.find(l => l.i === item.id);
+            return layoutItem ? { ...item, ...layoutItem } : item;
+        });
+
+        setPageData(data.map(page => ({
+            ...page,
+            items: updatedItems
+        })));
+    };
+ i] Inside the function, it defines a variable updatedItems. It's using the items.map method to iterate over each item in the items array
+ii] For each item, it's attempting to find the corresponding layout item in the layout array using the find method.
+iii] This line attempts to find a layout item whose i property matches the id property of the current item.
+iv] If a layout item is found (layoutItem is truthy), it returns a new object merging the properties of the original item and the layout item ({ ...item, ...layoutItem })(changed item).
+If no layout item is found (layoutItem is falsy), it returns the original item unchanged (item)
+v] Finally, it updates the page data by mapping over the data array. For each page, it spreads the properties of the page and updates the items property with the updatedItems.
+This commented-out code appears to be a previous version of the handleResizeStop function. It's likely responsible for updating the layout of items after resizing stops. However, it seems to be replaced or updated in your current implementation.
+
+5) code snippet 6:
+    const handleSelectItem = (id) => {
+        const updatedData = data.map(page => ({
+            ...page,
+            items: page.items.map(item => ({
+                ...item,
+                select: item.id === id
+            }))
+        }));
+        setPageData(updatedData);
+        setSidebarVisibility(true)
+    };
+
