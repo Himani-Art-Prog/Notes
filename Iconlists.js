@@ -1,3 +1,4 @@
+//we can import whole icon in this way
 import React from 'react';
 import * as LucideIcons from 'lucide-react';
 
