@@ -1,0 +1,21 @@
+ Extra Small Devices (Phones):
+
+Less than 576px wide.
+Common smartphones in portrait mode.
+Small Devices (Tablets):
+
+576px to 767px wide.
+Tablets and larger smartphones in landscape mode.
+Medium Devices (Laptops and Desktops):
+
+768px to 991px wide.
+Laptops, desktops, and larger tablets in landscape mode.
+Large Devices (Desktops):
+
+992px to 1199px wide.
+Larger desktop screens.
+Extra Large Devices (Large Desktops):
+
+1200px and above.
+Extra-large desktop monitors.
+These breakpoints provide a general guideline for designing responsive layouts that adapt to different screen sizes. However, it's important to remember that the boundaries between these categories can be somewhat fluid, and the exact breakpoints you choose may vary depending on your specific design requirements and the devices you're targeting. Additionally, with the increasing diversity of device sizes and resolutions, using fluid and flexible layout techniques is often preferable to relying solely on fixed breakpoints.
