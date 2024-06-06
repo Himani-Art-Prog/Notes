@@ -1,0 +1,128 @@
+import React, { useRef, useState } from 'react';
+import "./blocks.css";
+import { OverlayPanel } from 'primereact/overlaypanel';
+import { Iconlists } from '../features/Iconlists';
+
+export default function Headerstructure({ itemData }) {
+    const [activeProfile, setActiveProfile] = useState(null);
+    const { navigation, props } = itemData.content;
+    const op = useRef(null);
+    const handleClick = (e, profile) => {
+        setActiveProfile(profile);
+        op.current.toggle(e);
+    };
+
+    const subitems = [
+        {
+            icon: "pi pi-user",
+            label: 'Profile',
+            url: ''
+        },
+        {
+            icon: "pi pi-lock",
+            label: 'Change Password',
+            url: ''
+        },
+        {
+            icon: "pi pi-history",
+            label: 'Audit Report',
+            url: ''
+        },
+        {
+            icon: "pi pi-sign-out",
+            label: 'Logout',
+            url: ''
+        }
+    ]
+
+    // Sort navigation items by position
+    const sortedNavigation = [...navigation].sort((a, b) => a.position - b.position);
+    const profileItem = sortedNavigation.find(item => item.type === 'profile' && item.profileIsTrue)
+
+    return (
+        <header
+            className="navbar navbar-expand-lg"
+            style={{
+                ...props,
+                backgroundImage: props.isImage ? `url(${props.backgroundImage})` : 'none'
+            }}
+        >
+               <div className="navbar-container">
+            <ul className='navbar-items'>
+ 
+                {sortedNavigation.map((item, inx) => {
+                    if (item.type === 'logo' && item.isPresent) {
+                        return (
+                            <div key={item.id}>
+                                <a href={item.link || "#"}>
+                                    {item.logo && item.isUpload && (
+                                        <img src={item.logo} alt="not found" style={item.props} />
+                                    )}
+                                </a>
+                            </div>
+                        );
+                    }
+                    if (item.type === 'label' && item.isPresent) {
+                        return (
+                            <div key={item.id}>
+                                <a className="d-flex align-items-center p-menuitem-link " href={item.link || "#"}>
+                                    <span style={item.props}>{item.label}</span>
+                                </a>
+                            </div>
+                        );
+                    }
+                    if (item.type === 'icon' && item.isPresent) {
+                        return (
+                            <div key={item.id}>
+                                <a className="d-flex align-items-center p-menuitem-link " href={item.link}>
+                                    {item.icon !== "Ban" && item.iconIsTrue && Iconlists.map((icon, i) => (
+                                        icon.name === item.icon && <icon.icon key={i} style={item.props} />
+                                    ))}
+                                </a>
+                            </div>
+                        );
+                    }
+                    if (item.type === 'kpidata' && item.isPresent) {
+                        return (
+                            <div key={item.id}>
+                                <a className="d-flex align-items-center p-menuitem-link " href={item.link || "#"}>
+                                    {item.kpivalue && <span className='text-nowrap' style={item.props}>{item.kpivalue}</span>}
+                                </a>
+                            </div>
+                        );
+                    }
+                    if (item.type === 'timestamp' && item.isPresent) {
+                        return (
+                            <div key={item.id}>
+                                <a className="d-flex align-items-center p-menuitem-link " href={item.link || "#"}>
+                                    {item.format && <span className='text-nowrap' style={item.props}>{item.format}</span>}
+                                </a>
+                            </div>
+                        );
+                    }
+             
+                    return null;
+                })}
+            </ul>
+            {profileItem && (
+                    <div key={profileItem.id} className='profile-container'>
+                        <div className='d-flex align-items-center mb-0 justify-content-between'>
+                            <div className="d-flex align-items-center" style={profileItem.props}>
+                                <div className="usericonname">{profileItem.letter}</div>
+                                <span className="pi pi-chevron-down" onClick={(e) => handleClick(e, profileItem)} />
+                            </div>
+                            <OverlayPanel ref={op} className="p-0">
+                                {subitems.map((suitem, index) => (
+                                    <a className="d-flex align-items-center p-menuitem-link gap-2" key={index}>
+                                        {suitem.icon && <span className={suitem.icon} />}
+                                        {suitem.label && <span>{suitem.label}</span>}
+                                    </a>
+                                ))}
+                            </OverlayPanel>
+                        </div>
+                    </div>
+                )}
+            </div>
+        </header>
+    );
+}
