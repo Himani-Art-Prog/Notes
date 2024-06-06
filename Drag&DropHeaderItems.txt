@@ -1,0 +1,175 @@
+
+
+
+In this code i create two divs left & Right so i want drag & drop items in  left with right, right with left
+JSX code Should be:
+
+step 1:
+
+// Helper function to render items
+
+@navigation ha ek array ahe ani tyache items aplyala don divs mdhe divide kryche so apn te eka function mdhe stored karun ghetate
+
+const renderItems = (items) => {
+  return items.map((item, index) => (
+    <Draggable key={item.id} draggableId={item.id.toString()} index={index}>
+      {(provided, snapshot) => (
+        <div
+          className="ItemBox"
+          ref={provided.innerRef}
+          {...provided.draggableProps}
+          {...provided.dragHandleProps}
+          style={{
+            ...provided.draggableProps.style,
+            background: snapshot.isDragging ? 'lightblue' : 'white',
+            marginBottom: '1px',
+            padding: '1px',
+            border: '1px solid lightgrey',
+            borderRadius: '3px',
+          }}
+        >
+          {/* Render the item content here */}
+          {item.type === 'logo' && (
+            <div className='d-flex gap-2 align-items-center'>
+              <img src={item.logo} width={30} alt="Logo" />
+              <label className="lablefeildcss w-100">{item.logo}</label>
+            </div>
+          )}
+          {item.type === 'label' && (
+            <div className="d-flex align-items-center gap-1 m-2">
+              <label className="lablefeildcss">{item.label}</label>
+            </div>
+          )}
+          {/* Render other item types similarly */}
+        </div>
+      )}
+    </Draggable>
+  ));
+};
+
+
+step 2:
+//Ensure that your leftItems and rightItems are rendered correctly and separately for drag-and-drop purposes.
+
+  const leftItems = navigation.filter(item => item.positionType === 'Left');
+  const rightItems = navigation.filter(item => item.positionType === 'Right');
+  
+  ya mdhe leftItems & rightItems mdhe filter navigation array stored kela ahe, item type left asel tr to leftItems mdhe stored hoil ani item type right asel tr to rightItems mdhe stored hoil.
+  
+  
+  ************************************************************** Two Divs *****************************************************************
+  <>
+  <div className={`ArrayFieldItem-summary ${visibleHeader === selectedObject?.id ? "active" : ""}`} onClick={toggleVisibilityHeader}>
+    <label className="headingofcss"><b>Header Properties</b></label>
+  </div>
+  {visibleHeader == selectedObject?.id && (
+    <div className="ArrayFieldItem-body">
+      <CommonStyleEditorForHeader data={data} setPageData={setPageData} selectedObject={selectedObject} mainComponentProps={headerProperties} propsNameForCommonStyle={propsNameForCommonStyle} />
+    </div>
+  )}
+
+  <div>
+    <div className={`ArrayFieldItem-summary ${visibleHeadertwo === selectedObject?.id ? 'active' : ''}`} onClick={toggleVisibilityHeadertwo}>
+      <h6 className="headingofcss"><b>Add Items</b></h6>
+    </div>
+    {visibleHeadertwo === selectedObject?.id && (
+      <div>
+        <AddHeaderItems data={data} setPageData={setPageData} selectedObject={selectedObject} setVisibleBlockIconPicker={setVisibleBlockIconPicker} visibleBlockIconPicker={visibleBlockIconPicker} getNewItemName={getNewItemName} updatedHeaderNavigator={updatedHeaderNavigator} setItemVisible={setItemVisible} setAddItemVisible={setAddItemVisible} />
+      </div>
+    )}
+  </div>
+  <div className={`ArrayFieldItem-summary ${visibleHeaderone === selectedObject?.id ? "active" : ""}`} onClick={toggleVisibilityHeaderone}>
+    <h6 className="headingofcss"><b>Header Items</b></h6>
+  </div>
+  {(itemVisible || visibleHeaderone === selectedObject?.id) && (
+    <div className="Input">
+      <DragDropContext onDragEnd={handleOnDragEnd}>
+        <div className="header-container">
+          <Droppable droppableId="leftItems">
+            {(provided) => (
+              <div>
+                <label className="lablefeildcss w-100">Left Header Items:</label>
+                <div className="ArrayFieldItem-body">
+                  <div className="left-items" ref={provided.innerRef} {...provided.droppableProps}>
+                    {renderItems(leftItems)}
+                    {provided.placeholder}
+                  </div>
+                </div>
+              </div>
+            )}
+          </Droppable>
+          <Droppable droppableId="rightItems">
+            {(provided) => (
+              <div>
+                <label className="lablefeildcss w-100">Right Header Items:</label>
+                <div className="ArrayFieldItem-body">
+                  <div className="right-items" ref={provided.innerRef} {...provided.droppableProps}>
+                    {renderItems(rightItems)}
+                    {provided.placeholder}
+                  </div>
+                </div>
+              </div>
+            )}
+          </Droppable>
+        </div>
+      </DragDropContext>
+    </div>
+  )}
+</>
+
+
+JavaScript Logic:
+Update the handleOnDragEnd function to handle dragging and dropping between different divs.
+
+  const handleOnDragEnd = (result) => {
+    const { source, destination } = result;
+
+    // Dropped outside the list
+    if (!destination) return;
+
+    let updatedNavigation = [...navigation];
+
+    // Find the item being dragged
+    const draggedItem = updatedNavigation.find(item => item.id.toString() === result.draggableId);
+
+    // Determine the source and destination arrays
+    const sourceList = source.droppableId === 'leftItems' ? leftItems : rightItems;
+    const destList = destination.droppableId === 'leftItems' ? leftItems : rightItems;
+
+    // Remove the item from the source list
+    const [removedItem] = sourceList.splice(source.index, 1);
+
+    // Add the item to the destination list
+    destList.splice(destination.index, 0, removedItem);
+
+    // Update the position type of the dragged item based on the droppable area
+    removedItem.positionType = destination.droppableId === 'leftItems' ? 'Left' : 'Right';
+
+
+    // Merge the updated lists back into the navigation array
+    updatedNavigation = [...leftItems, ...rightItems];
+
+    // Update the navigation state
+    updatedHeaderNavigator(updatedNavigation);
+  };
+
+
+Explanation:
+Droppable Components:
+
+Two Droppable components are defined: leftItems and rightItems. Each one represents a container where items can be dropped.
+Drag and Drop Context:
+
+The DragDropContext wraps around the droppable containers to enable drag-and-drop functionality.
+handleOnDragEnd Function:
+
+The function checks if the item is dropped outside any list and returns if so.
+It identifies the source and destination lists (leftItems or rightItems).
+It removes the item from the source list and adds it to the destination list.
+The positionType of the dragged item is updated based on the destination list.
+The updated lists are merged back into the navigation array, and the state is updated using updatedHeaderNavigator.
+renderItems Function:
+
+This helper function renders the items within the Droppable containers using the Draggable component.
+It ensures that each item is rendered correctly based on its type (logo, label, etc.).
+This setup ensures that items can be dragged and dropped within and between the left and right containers, updating their positions and states accordingly.
