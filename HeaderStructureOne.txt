@@ -1,142 +1,387 @@
-import React, { useRef, useState } from 'react';
-import "./blocks.css";
-import { OverlayPanel } from 'primereact/overlaypanel';
-import { Iconlists } from '../features/Iconlists';
+import React, { useState, useEffect } from 'react';
+import { Accordion, AccordionTab } from 'primereact/accordion';
+import dummyimg from '../../../assets/dummyImg.png';
+import { generateDynamicId } from "../../features/generateDynamicId";
+import CommonStyleEditorForLabel from './commonCodeOfRightsidebar/CommonStyleEditorForLabel';
+import FontAwesomeIconPicker from '../../features/FontAwesomeIconPicker';
+import CommonStyleEditorForIcon from './commonCodeOfRightsidebar/CommonStyleEditorForIcon';
+import CommonStyleEditorForLogo from './commonCodeOfRightsidebar/CommonStyleEditorForLogo';
+import { getBase64 } from "../../features/generateDynamicId";
+import '../../styles/allstyles.css';
 
-export default function Headerstructure({ itemData }) {
-    const [activeProfile, setActiveProfile] = useState(null);
-    const { navigation, props } = itemData.content;
-    const op = useRef(null);
-    const handleClick = (e, profile) => {
-        setActiveProfile(profile);
-        op.current.toggle(e);
+export default function AddHeaderItems({ data, setPageData, selectedObject, setVisibleBlockIconPicker, visibleBlockIconPicker, getNewItemName, updatedHeaderNavigator, setItemVisible, setAddItemVisible }) {
+    const { navigation } = selectedObject.content;
+    const [selectedOption, setSelectedOption] = useState('NA');
+    const [uniqueTypes, setUniqueTypes] = useState(['label', 'logo', 'icon', 'kpidata', 'timestamp', 'profile']);
+    const [timestampFormat, setTimestampFormat] = useState('YYYY-MM-DD');
+    const [customTimestampFormat, setCustomTimestampFormat] = useState('');
+    const [selectedFile, setSelectedFile] = useState(null);
+    const [nameOfImage, setNameOfImage] = useState("Upload Logo");
+    const [fileURL, setFileURL] = useState('');
+
+    const [formData, setFormData] = useState({
+        label: '',
+        logo: null,
+        icon: '',
+        kpivalue: '',
+        format: '',
+        profile: '',
+    });
+    const handleLogoAdd = (e) => {
+        const selectedFile = e.target.files[0];
+        setNameOfImage(selectedFile.name);
+
+        getBase64(selectedFile)
+            .then(result => {
+                const logoDataUrl = result;
+                setSelectedFile(selectedFile); // Update selected file
+                setFormData(prevState => ({
+                    ...prevState,
+                    logo: logoDataUrl // Set logo data URL in formData
+                }));
+                console.log('Selected Item:', logoDataUrl);
+            })
+            .catch(err => {
+                console.log(err);
+            });
     };
 
-    const subitems = [
-        {
-            icon: "pi pi-user",
-            label: 'Profile',
-            url: ''
-        },
-        {
-            icon: "pi pi-lock",
-            label: 'Change Password',
-            url: ''
-        },
-        {
-            icon: "pi pi-history",
-            label: 'Audit Report',
-            url: ''
-        },
-        {
-            icon: "pi pi-sign-out",
-            label: 'Logout',
-            url: ''
-        }
-    ]
+    const handleInputChange = (e) => {
+        const { name, value, files } = e.target;
+        console.log(name, value, files);
 
-    // Sort navigation items by position
-    const sortedNavigation = [...navigation].sort((a, b) => a.position - b.position);
-    const profileItem = sortedNavigation.find(item => item.type === 'profile' && item.profileIsTrue)
+        if (name === 'logo' && files.length > 0) {
+            const file = files[0];
+            const objectURL = URL.createObjectURL(file);
+            setFileURL(objectURL); // Set the object URL for preview
+            setFormData(prevState => ({
+                ...prevState,
+                [name]: file // Store the file object in formData
+            }));
+        } else {
+            setFormData(prevState => ({
+                ...prevState,
+                [name]: value
+            }));
+
+            if (name === 'format' && value !== 'Custom') {
+                setTimestampFormat(value);
+                setFormData(prevState => ({
+                    ...prevState,
+                    [name]: value
+                }));
+            }
+
+        }
+    };
+
+    useEffect(() => {
+        return () => {
+            if (fileURL) {
+                URL.revokeObjectURL(fileURL);
+            }
+        };
+    }, [fileURL]);
+    const handleSelectChange = (event) => {
+        setSelectedOption(event.target.value);
+    };
+
+    const selectedNavigationItem = navigation ? navigation.find(item => item.type === selectedOption) : null;
+
+
+    const handleAddItemInHeaderItem = (type, logoDataUrl) => {
+        const newItemId = generateDynamicId();
+        let newItem = {};
+        switch (type) {
+            case 'logo':
+                newItem = {
+                    id: newItemId,
+                    logo: formData.logo || 'dummyimg', //Use actual image
+                    // logo: 'image',
+                    type: 'logo',
+                    isUpload: true,
+                    isPresent: true,
+                    link: "NA",
+                    props: {
+                        width: '30px',
+                        height: '30px',
+                        padding: '1px 1px 1px 1px',
+                        margin: '3px 3px 3px 3px',
+                        borderWidth: "0px 0px 0px 0px",
+                        borderColor: '#000',
+                        borderStyle: 'solid',
+
+                    }
+                };
+                break;
+            case 'label':
+                newItem = {
+                    id: newItemId,
+                    label: formData.label || "Main Label",
+                    type: 'label',
+                    isPresent: true,
+                    link: "NA",
+                    props: {
+                        fontSize: '15px',
+                        fontWeight: 500,
+                        color: '#000',
+                        fontFamily: 'Arial Black',
+                        padding: '1px 1px 1px 1px',
+                        margin: '1px 10px 1px 10px',
+                        borderWidth: "0px 0px 0px 0px",
+                        borderColor: '#000',
+                        borderStyle: 'solid',
+                        backgroundColor: 'transparant'
+                    },
+                };
+                break;
+            case 'icon':
+                newItem = {
+                    id: newItemId,
+                    type: 'icon',
+                    iconIsTrue: true,
+                    isPresent: true,
+                    icon: formData.icon || "Home",// Use actual icon if available
+                    link: "NA",
+                    props: {
+                        height: '20px',
+                        width: '20px',
+                        fontWeight: 500,
+                        color: '#000',
+                        borderWidth: "0px 0px 0px 0px",
+                        borderColor: '#000',
+                        borderStyle: 'solid',
+                        padding: '1px 1px 1px 1px',
+                        margin: '1px 10px 1px 10px',
+                        backgroundColor: 'transparant'
+                    },
+                };
+                break;
+            case 'kpidata':
+                newItem = {
+                    id: newItemId,
+                    type: 'kpidata',
+                    kpilabel: "KPI:",
+                    kpivalue: formData.kpivalue || "0000", // Use actual value if available
+                    kpiname: formData.kpiname || "Not mapped",
+                    // kpivalue: 24.70,
+                    // kpiname: 'test1',
+                    isPresent: true,
+                    link: "NA",
+                    props: {
+                        fontSize: '15px',
+                        fontWeight: 500,
+                        color: '#000',
+                        fontFamily: 'Arial Black',
+                        padding: '1px 1px 1px 1px',
+                        margin: '1px 10px 1px 10px',
+                        borderWidth: "0px 0px 0px 0px",
+                        borderColor: '#000',
+                        borderStyle: 'solid',
+                        backgroundColor: 'transparant'
+                    },
+                };
+                break;
+            case 'timestamp':
+                newItem = {
+                    id: newItemId,
+                    name: 'Timestamp:',
+                    type: 'timestamp',
+                    timestampvalue: "",
+                    isPresent: true,
+                    iconIsTrue: false,
+                    format: formData.format || "YYYY-MM-DD", // Use actual format if available
+                    // format: "HH:MM:SS",
+                    props: {
+
+                        fontSize: '15px',
+                        fontWeight: 500,
+                        color: '#000',
+                        fontFamily: 'Arial Black',
+                        padding: '1px 1px 1px 1px',
+                        margin: '1px 10px 1px 10px',
+                        borderWidth: "0px 0px 0px 0px",
+                        borderColor: '#000',
+                        borderStyle: 'solid',
+                        backgroundColor: 'transparant'
+                    },
+                };
+                break;
+            case 'profile':
+                newItem = {
+                    id: newItemId,
+                    type: 'profile',
+                    letter: 'C',
+                    profileIsTrue: true,
+                    isPresent: true,
+                    link: "NA",
+                    props: {
+                        fontSize: '15px',
+                        fontWeight: 500,
+                        color: '#000',
+                        fontFamily: 'Arial Black',
+                        padding: '1px 1px 1px 1px',
+                        margin: '1px 10px 1px 10px',
+                        borderWidth: "0px 0px 0px 0px",
+                        borderColor: '#000',
+                        borderStyle: 'solid',
+                        borderRadius: '20px',
+                        backgroundColor: 'pink'
+                    },
+                };
+                break;
+            default:
+                console.error(`Unknown type: ${type}`);
+                return;
+        }
+
+        const updatedNavigation = [...navigation, newItem];
+        updatedHeaderNavigator(updatedNavigation);
+    };
+
+    const addAllItemTypes = () => {
+        handleAddItemInHeaderItem(selectedOption, selectedNavigationItem);
+        setItemVisible(true);
+        setAddItemVisible(true);
+
+
+    };
+
 
     return (
-        <header
-            className="navbar navbar-expand-lg navbar-light bg-light"
-            style={{
-                ...props,
-                backgroundImage: props.isImage ? `url(${props.backgroundImage})` : 'none'
-            }}
-        >
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav">
+        <div className="ArrayFieldItem-body">
+            <fieldset className="ArrayFieldItem-fieldset">
+                <div>
+                    <select className="inputfeildofcss mb-1" value={selectedOption} onChange={handleSelectChange}>
+                        <option value="NA">Please Select</option>
+                        {uniqueTypes.map((type, index) => (
+                            <option key={index} value={type}>{type}</option>
+                        ))}
+                    </select>
+                </div>
+                {selectedNavigationItem && (
+                    <div>
 
-                    {sortedNavigation.map((item, inx) => {
-                        if (item.type === 'logo' && item.isPresent) {
-                            return (
-                                <li class="nav-item active">
-                                <div key={item.id} className="d-flex" >
-                                    <a href={item.link || "#"} class="nav-link">
-                                        {item.logo && item.isUpload && (
-                                            <img src={item.logo} alt="not found" style={item.props} />
-                                        )}
-                                    </a>
+                        {selectedOption === 'label' && (
+                            <div>
+                                <div className="d-flex align-items-center gap-1 m-2">
+                                    <label className="lablefeildcss">Name:</label>
+                                    <input
+                                        className="inputfeildofcss"
+                                        name="label"
+                                        value={formData.label}
+                                        onChange={handleInputChange}
+                                    />
                                 </div>
-                                </li>
-                            );
-                        }
-                        if (item.type === 'label' && item.isPresent) {
-                            return (
-                                <li class="nav-item">
-                                <div key={item.id} className="d-flex" >
-                                    <a className="d-flex align-items-center p-menuitem-link " href={item.link || "#"}>
-                                        <span className="d-flex" style={item.props}>{item.label}</span>
-                                    </a>
-                                </div>
-                                </li>
-                            );
-                        }
-                        if (item.type === 'icon' && item.isPresent) {
-                            return (
-                                <li class="nav-item">
-                                <div key={item.id} className="d-flex" >
-                                    <a className="d-flex align-items-center p-menuitem-link " href={item.link}>
-                                        {item.icon !== "Ban" && item.iconIsTrue && Iconlists.map((icon, i) => (
-                                            icon.name === item.icon && <icon.icon key={i} style={item.props} />
-                                        ))}
-                                    </a>
-                                </div>
-                                </li>
-                            );
-                        }
-                        if (item.type === 'kpidata' && item.isPresent) {
-                            return (
-                                <li class="nav-item">
-                                <div key={item.id} className="d-flex" >
-                                    <a className="d-flex align-items-center p-menuitem-link " href={item.link || "#"}>
-                                        {item.kpivalue && <span className="d-flex" style={item.props}>{item.kpivalue}</span>}
-                                    </a>
-                                </div>
-                                </li>
-                            );
-                        }
-                        if (item.type === 'timestamp' && item.isPresent) {
-                            return (
-                                <li class="nav-item">
-                                <div key={item.id} className="d-flex" >
-                                    <a className="d-flex align-items-center p-menuitem-link " href={item.link || "#"}>
-                                        {item.format && <span className="d-flex" style={item.props}>{item.format}</span>}
-                                    </a>
-                                </div>
-                                </li>
-                            );
-                        }
-
-                        return null;
-                    })}
-                </ul>
-                {profileItem && (
-                    <div key={profileItem.id} className='profile-container'>
-                        <div className='d-flex align-items-center mb-0 justify-content-between'>
-                            <div className="d-flex align-items-center" style={profileItem.props}>
-                                <div className="usericonname">{profileItem.letter}</div>
-                                <span className="pi pi-chevron-down" onClick={(e) => handleClick(e, profileItem)} />
+                            
+                               
                             </div>
-                            <OverlayPanel ref={op} className="p-0">
-                                {subitems.map((suitem, index) => (
-                                    <a className="d-flex align-items-center p-menuitem-link" key={index}>
-                                        {suitem.icon && <span className={suitem.icon} />}
-                                        {suitem.label && <span>{suitem.label}</span>}
-                                    </a>
-                                ))}
-                            </OverlayPanel>
-                        </div>
+
+
+
+                        )}
+                        {selectedOption === 'logo' && (
+                            <div>
+                                <div className="d-flex align-items-center justify-content-between gap-1 position-relative">
+                                    <div className='d-flex gap-2 align-items-center'>
+                                        <img src={formData.logo ? formData.logo : dummyimg} width={30} alt={nameOfImage} />
+                                        <label className="lablefeildcss w-100">{nameOfImage}</label>
+                                    </div>
+                                    <button className="p-button p-button p-button-rounded p-2" type="button">
+                                        <span className='pi pi-upload mb-0' style={{ fontSize: '0.8rem' }}></span>
+                                    </button>
+                                    <input type="file" name="logo" className='uploadfileOption' onChange={handleLogoAdd} />
+                                </div>
+                               
+                            </div>
+
+                        )}
+                        {selectedOption === 'icon' && (
+                            <div>
+                                {/* <div className="align-items-center gap-1 m-2">
+                                    <div className='d-flex align-items-center justify-content-between mb-1'>
+                                        <div
+                                            className='boxicon'
+                                            onClick={() => setVisibleBlockIconPicker(!visibleBlockIconPicker)}
+                                        >
+                                            <label className='lablefeildcss w-100'>Choose icon</label>
+                                        </div>
+                                    </div>
+                                    {visibleBlockIconPicker && (
+                                        <FontAwesomeIconPicker
+                                            itemID={selectedNavigationItem.id}
+                                            iconName={selectedNavigationItem.icon}
+                                            getNewItemName={getNewItemName}
+                                        />
+                                    )}
+                                </div> */}
+                              
+
+                            </div>
+                        )}
+                        {selectedOption === 'kpidata' && (
+                            <div>
+                                <div className="d-flex align-items-center gap-1 m-2">
+                                    <label className="lablefeildcss">Kpiname</label>
+                                    <select className="inputfeildofcss" name="kpiname"
+                                        value={formData.kpiname} onChange={handleInputChange}
+                                    >
+                                        <option value="KPI1">Test 1</option>
+                                        <option value="KPI2">Test 2</option>
+                                    </select>
+                                </div>
+
+                                <div className="d-flex align-items-center gap-1 m-2">
+                                    <label className="lablefeildcss">Value:</label>
+                                    <input className="inputfeildofcss" name="kpivalue"
+                                        value={formData.kpivalue} onChange={handleInputChange}
+                                    />
+                                </div>
+                                
+                            </div>
+                        )}
+                        {selectedOption === 'timestamp' && (
+                            <>
+                                <div className="d-flex align-items-center gap-1 m-2">
+                                    <label className="lablefeildcss">Kpiname</label>
+                                    <select className="inputfeildofcss" name="kpiname"
+                                        value={formData.kpiname} onChange={handleInputChange}
+                                    >
+                                        <option value="KPI1">Test 1</option>
+                                        <option value="KPI2">Test 2</option>
+                                    </select>
+                                </div>
+                                <div className="d-flex align-items-center gap-1 m-2">
+                                    <label className="lablefeildcss">Format:</label>
+                                    <select
+                                        className="inputfeildofcss"
+                                        name="format"
+                                        value={formData.format}
+                                        onChange={(e) => handleInputChange(e)}
+                                    >
+                                        <option value="YYYY-MM-DD">YYYY-MM-DD</option>
+                                        <option value="HH:MM:SS">HH:MM:SS</option>
+                                        <option value="YYYY-MM-DD HH:MM:SS">YYYY-MM-DD HH:MM:SS</option>
+                                        <option value="DD MMM YYYY">DD MMM YYYY</option>
+                                        <option value="MM/DD/YYYY HH:MM">MM/DD/YYYY HH:MM</option>
+                                        <option value="MMM DD YYYY HH:MM:SS">MMM DD YYYY HH:MM:SS</option>
+                                        
+                                    </select>
+                                </div>
+                               
+
+                            </>
+                        )}
+                        {selectedOption === 'profile' && (
+                            <div>
+                                {/* Add profile related fields here */}
+                                
+                            </div>
+                        )}
                     </div>
                 )}
-            </div>
-        </header>
+                <button className="buttonFeild" style={{ marginLeft: '50px' }} onClick={addAllItemTypes}>ADD ITEM</button>
+            </fieldset>
+        </div>
     );
 }
