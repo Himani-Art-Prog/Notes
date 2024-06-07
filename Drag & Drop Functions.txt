@@ -1,0 +1,119 @@
+Drag & Drop functionality Variations:
+
+1]drag & drop with single array:
+
+eg 1 :-
+  const handleOnDragEnd = (result) => {
+    const { source, destination } = result;
+    if (!destination) return;
+    const isSameList = source.droppableId === destination.droppableId;
+    if (isSameList) {
+
+      const list = source.droppableId === 'leftItems' ? leftItems : rightItems;
+
+      const [movedItem] = list.splice(source.index, 1);
+      list.splice(destination.index, 0, movedItem);
+
+      list.forEach((item, index) => {
+        item.position = index + 1;
+      });
+
+      const updatedNavigation = [...leftItems, ...rightItems];
+      updatedHeaderNavigator(updatedNavigation);
+    }
+  };
+  
+  eg :-
+    const handleOnDragEnd = (result) => {
+    if (!result.destination) return;
+
+    const items = Array.from(navigation);
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reorderedItem);
+
+    // Update position
+    items.forEach((item, index) => {
+      item.position = index + 1;
+    });
+    updatedHeaderNavigator(items);
+
+  };
+
+2]drag & drop with Two array:
+
+  const handleOnDragEnd = (result) => {
+    const { source, destination } = result;
+
+    // Dropped outside the list
+    if (!destination) return;
+
+    let updatedNavigation = [...navigation];
+
+    // Find the item being dragged
+    const draggedItem = updatedNavigation.find(item => item.id.toString() === result.draggableId);
+
+    // Determine the source and destination arrays
+    const sourceList = source.droppableId === 'leftItems' ? leftItems : rightItems;
+    const destList = destination.droppableId === 'leftItems' ? leftItems : rightItems;
+
+    // Remove the item from the source list
+    const [removedItem] = sourceList.splice(source.index, 1);
+
+    // Add the item to the destination list
+    destList.splice(destination.index, 0, removedItem);
+
+    // Update the position type of the dragged item based on the droppable area
+    removedItem.positionType = destination.droppableId === 'leftItems' ? 'Left' : 'Right';
+
+
+    // Merge the updated lists back into the navigation array
+    updatedNavigation = [...leftItems, ...rightItems];
+
+    // Update the navigation state
+    updatedHeaderNavigator(updatedNavigation);
+  };
+
+
+3] Combine them:
+
+  const handleOnDragEnd = (result) => {
+    const { source, destination } = result;
+
+    // Dropped outside the list
+    if (!destination) return;
+
+    const sourceList = source.droppableId === 'leftItems' ? leftItems : rightItems;
+    const destList = destination.droppableId === 'leftItems' ? leftItems : rightItems;
+
+    // If the item is dragged within the same list
+    if (source.droppableId === destination.droppableId) {
+        const [movedItem] = sourceList.splice(source.index, 1);
+        sourceList.splice(destination.index, 0, movedItem);
+
+        // Update positions in the list
+        sourceList.forEach((item, index) => {
+            item.position = index + 1;
+        });
+    } else {
+        // If the item is dragged across different lists
+        const [removedItem] = sourceList.splice(source.index, 1);
+        destList.splice(destination.index, 0, removedItem);
+
+        // Update the position type of the dragged item based on the droppable area
+        removedItem.positionType = destination.droppableId === 'leftItems' ? 'Left' : 'Right';
+
+        // Update positions in both lists
+        sourceList.forEach((item, index) => {
+            item.position = index + 1;
+        });
+        destList.forEach((item, index) => {
+            item.position = index + 1;
+        });
+    }
+
+    // Merge the updated lists back into the navigation array
+    const updatedNavigation = [...leftItems, ...rightItems];
+
+    // Update the navigation state
+    updatedHeaderNavigator(updatedNavigation);
+};
