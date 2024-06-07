@@ -95,3 +95,20 @@ This commented-out code appears to be a previous version of the handleResizeStop
         setSidebarVisibility(true)
     };
 
+6) code snippet 7:
+ const sortedNavigation = [...navigation].sort((a, b) => a.position - b.position);
+
+1] const sortedNavigation: This declares a new constant variable named sortedNavigation to store the sorted array.
+2] ([...navigation]): This part creates a shallow copy of the navigation array using the spread operator [...]. 
+This ensures that the original array navigation remains unchanged during the sorting process.
+3] .sort((a, b) => a.position - b.position): This method sorts the copied array based on a comparison function. Here, the comparison function (a, b) => a.position - b.position is used.
+4] (a, b) are two elements being compared during the sorting process.
+5] a.position - b.position is a comparison operation based on the position property of the elements a and b.
+6] If a.position is less than b.position, the comparison function returns a negative value, indicating that a should come before b in the sorted array.
+7] If a.position is greater than b.position, the comparison function returns a positive value, indicating that b should come before a in the sorted array.
+8]If a.position is equal to b.position, the comparison function returns 0, indicating that the relative order of a and b remains unchanged.
+Summary:
+After sorting, sortedNavigation will contain the elements of navigation sorted by their position property in ascending order.
+This is useful for maintaining a consistent order of elements based on their positions.
+
+
