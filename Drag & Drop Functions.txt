@@ -117,3 +117,48 @@ eg 1 :-
     // Update the navigation state
     updatedHeaderNavigator(updatedNavigation);
 };
+
+
+After Sorting I reverse array to show right items descending order:
+
+const handleOnDragEnd = (result) => {
+  const { source, destination } = result;
+
+  // Dropped outside the list
+  if (!destination) return;
+
+  // Determine the source and destination lists based on droppable IDs
+  let sourceList, destList;
+  if (source.droppableId === 'leftItems') {
+      sourceList = leftItems;
+      destList = destination.droppableId === 'leftItems' ? leftItems : rightItems;
+  } else {
+      sourceList = rightItems;
+      destList = destination.droppableId === 'leftItems' ? leftItems : rightItems;
+  }
+
+  // Perform the drag-and-drop operation
+  const [removedItem] = sourceList.splice(source.index, 1);
+  destList.splice(destination.index, 0, removedItem);
+
+  // Update the position type of the dragged item based on the droppable area
+  removedItem.positionType = destination.droppableId === 'leftItems' ? 'Left' : 'Right';
+
+  // Update positions in both lists
+  sourceList.forEach((item, index) => {
+      item.position = index + 1;
+  });
+
+  // Update positions in the destination list (rightItems) based on original positions
+  // Sort rightItems based on original positions before updating positions
+  const sortedRightItems = rightItems.sort((a, b) => a.position - b.position).reverse();
+  sortedRightItems.forEach((item, index) => {
+      item.position = index + 1;
+  });
+
+  // Merge the updated lists back into the navigation array
+  const updatedNavigation = [...leftItems, ...rightItems];
+
+  // Update the navigation state
+  updatedHeaderNavigator(updatedNavigation);
+};
