@@ -1,0 +1,142 @@
+import React, { useRef, useState } from 'react';
+import "./blocks.css";
+import { OverlayPanel } from 'primereact/overlaypanel';
+import { Iconlists } from '../features/Iconlists';
+
+export default function Headerstructure({ itemData }) {
+    const [activeProfile, setActiveProfile] = useState(null);
+    const { navigation, props } = itemData.content;
+    const op = useRef(null);
+    
+    const handleClick = (e, profile) => {
+        setActiveProfile(profile);
+        op.current.toggle(e);
+    };
+
+    const subitems = [
+        {
+            icon: "pi pi-user",
+            label: 'Profile',
+            url: ''
+        },
+        {
+            icon: "pi pi-lock",
+            label: 'Change Password',
+            url: ''
+        },
+        {
+            icon: "pi pi-history",
+            label: 'Audit Report',
+            url: ''
+        },
+        {
+            icon: "pi pi-sign-out",
+            label: 'Logout',
+            url: ''
+        }
+    ]
+    const sortedNavigation = [...navigation].sort((a, b) => a.position - b.position);
+  
+    const leftItems = sortedNavigation.filter(item => item.positionType === 'Left');
+;
+    const rightItems = sortedNavigation.filter(item => item.positionType === 'Right').reverse();
+
+    const renderNavItem = (item) => {
+        if (!item.isPresent) return null;
+        switch (item.type) {
+            case 'logo':
+                return (
+                    <li className="nav-item" key={item.id}>
+                        <a href={item.link || "#"}>
+                            {item.logo && item.isUpload && (
+                                <img src={item.logo} alt="not found" style={item.props} />
+                            )}
+                        </a>
+                    </li>
+                );
+            case 'label':
+                return (
+                    <li className="nav-item" key={item.id}>
+                        <a className="d-flex align-items-center p-menuitem-link" href={item.link || "#"}>
+                            <span className="d-flex" style={item.props}>{item.label}</span>
+                        </a>
+                    </li>
+                );
+            case 'icon':
+                return (
+                    <li className="nav-item" key={item.id}>
+                        <a className="Item d-flex align-items-center p-menuitem-link" href={item.link}>
+                            {item.icon !== "Ban" && item.iconIsTrue && Iconlists.map((icon, i) => (
+                                icon.name === item.icon && <icon.icon key={i} style={item.props} />
+                            ))}
+                        </a>
+                    </li>
+                );
+            case 'kpidata':
+                return (
+                    <li className="nav-item" key={item.id}>
+                        <a className="Item  d-flex align-items-center p-menuitem-link" href={item.link || "#"}>
+                            {item.kpivalue && <span className="d-flex" style={item.props}>{item.kpivalue}</span>}
+                        </a>
+                    </li>
+                );
+            case 'timestamp':
+                return (
+                    <li className="nav-item" key={item.id}>
+                        <a className="Item  d-flex align-items-center p-menuitem-link" href={item.link || "#"}>
+                            {item.format && <span className="d-flex" style={item.props}>{item.format}</span>}
+                        </a>
+                    </li>
+                );
+            case 'profile':
+                return (
+                    <li className="nav-item profile-container" key={item.id}>
+                        <div className="d-flex align-items-center" >
+                            <div className="" style={item.props}>
+                                <div className="usericonname">{item.letter}</div>
+                            </div>
+                            <div style={{ marginRight: "5px" }}>
+                                <span className="pi pi-chevron-down" onClick={(e) => handleClick(e, item)} />
+                            </div>
+                        </div>
+
+                        <OverlayPanel ref={op} className="p-0">
+                            {subitems.map((suitem, index) => (
+                                <a className="d-flex align-items-center p-menuitem-link" key={index} href={suitem.url}>
+                                    {suitem.icon && <span className={suitem.icon} />}
+                                    {suitem.label && <span>{suitem.label}</span>}
+                                </a>
+                            ))}
+                        </OverlayPanel>
+                    </li>
+                );
+            default:
+                return null;
+        }
+    };
+
+    return (
+        <header
+            className="navbar navbar-expand-lg navbar-light"
+            style={{
+                ...props,
+                backgroundImage: props.isImage ? `url(${props.backgroundImage})` : 'none'
+            }}
+        >
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="headerItems collapse navbar-collapse" id="navbarNav">
+                <ul className="listOne navbar-nav mr-auto d-flex">
+                    {leftItems.map(renderNavItem)}
+                </ul>
+                <ul className="listTwo navbar-nav ml-auto">
+                    {rightItems.map(renderNavItem)}
+                </ul>
+            </div>
+        </header>
+    );
+
+}
