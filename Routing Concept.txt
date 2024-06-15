@@ -1,0 +1,108 @@
+Routing Concept:
+
+Routing in React.js allows you to build single-page applications with multiple views or pages that can be navigated without a full page reload.
+Here’s a basic guide on how to use routing inside React.js:
+
+*****************************************************************************************
+
+Install React Router
+First, you need to install react-router-dom, which is the routing library for React:
+
+npm install react-router-dom
+
+******************************************************************************************
+
+Set Up Basic Routing
+In your React application, typically in your main App.js or index.js, you'll set up routing using components from react-router-dom.
+
+import React from 'react';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import Home from './components/Home';
+import About from './components/About';
+import Contact from './components/Contact';
+import NotFound from './components/NotFound';
+
+function App() {
+  return (
+    <Router>
+      <div className="App">
+        <Switch>
+          <Route exact path="/" component={Home} />
+          <Route path="/about" component={About} />
+          <Route path="/contact" component={Contact} />
+          <Route component={NotFound} /> {/* This is a fallback in case no route matches */}
+        </Switch>
+      </div>
+    </Router>
+  );
+}
+
+export default App;
+
+************************************************************************************************
+
+Router Components:
+BrowserRouter: Uses HTML5 history API (pushState, replaceState, and the popstate event) to keep UI in sync with URL.
+Switch: Renders the first child <Route> or <Redirect> that matches the location.
+Route: Renders some UI when its path matches the current URL.
+
+Route Components:
+Route: The most important component in React Router. It renders some UI when its path matches the current URL.
+path: URL path for which the component should render.
+component or render: Component or function to render when the path matches.
+exact: When true, will only match if the path matches the location.pathname exactly.
+
+**************************************************************************************************
+
+Navigation:
+
+import { Link } from 'react-router-dom';
+
+function Navbar() {
+  return (
+    <nav>
+      <ul>
+        <li><Link to="/">Home</Link></li>
+        <li><Link to="/about">About</Link></li>
+        <li><Link to="/contact">Contact</Link></li>
+      </ul>
+    </nav>
+  );
+}
+
+****************************************************************************************************
+
+Nested Routing
+You can also nest routes by placing <Route> components inside each other, typically within components rendered by other routes.
+
+function App() {
+  return (
+    <Router>
+      <div className="App">
+        <Switch>
+          <Route exact path="/" component={Home} />
+          <Route path="/about" component={About} />
+          <Route path="/products">
+            <Products />
+          </Route>
+          <Route path="/contact" component={Contact} />
+          <Route component={NotFound} />
+        </Switch>
+      </div>
+    </Router>
+  );
+}
+
+function Products() {
+  return (
+    <div>
+      <h2>Products</h2>
+      <Switch>
+        <Route exact path="/products" component={ProductList} />
+        <Route path="/products/:id" component={ProductDetails} />
+      </Switch>
+    </div>
+  );
+}
+
+
